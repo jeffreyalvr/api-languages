@@ -31,6 +31,7 @@
 - [x] See if title is less than 3 characters long
 - [x] See if title is bigger than 15 (courses) or 25 (topics) characters long
 
+- Others:
 - [x] Optimize code (25/07)
 - [ ] Switch from arrays to a SQLITE database (25/07)
 - [ ] Develop a frontend interface using React JS (26/07)
