@@ -2,10 +2,15 @@
   "name": "api-languages",
   "version": "1.0.0",
   "main": "main.js",
+  "scripts": {
+    "knex:seed": "knex --knexfile knexfile.ts seed:run",
+    "knex:migrate": "knex --knexfile knexfile.ts migrate:latest"
+  },
   "license": "MIT",
   "dependencies": {
     "@hapi/joi": "^17.1.1",
     "express": "^4.17.1",
+    "knex": "^0.21.2",
     "sqlite3": "^5.0.0"
   }
 }

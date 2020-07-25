@@ -36,8 +36,10 @@ app.get('/', (req, res) => {
 
 // 1. Add a course
 app.post('/courses', (req, res) => {
-  if (!req.body.title) {
-    res.status(400).send('The course\'s title can\'t be empty.');
+  const { error } = validateTitle(req.body.title, 3, 15);
+
+  if (error) {
+    res.status(400).send(error.details[0].message);
     return;
   }
 
@@ -72,8 +74,10 @@ app.put('/courses/:id', (req, res) => {
     return;
   }
 
-  if (!req.body.title) {
-    res.status(400).send('The course\'s title can\'t be empty.');
+  const { error } = validateTitle(req.body.title, 3, 15);
+
+  if (error) {
+    res.status(400).send(error.details[0].message);
     return;
   }
 
@@ -96,7 +100,7 @@ app.get('/courses', (req, res) => {
     serializedCourses.push({ id: course.id, title: course.title });
   });
 
-  res.send(serializedCourses);
+  res.status(200).send(serializedCourses);
 });
 
 // 4. List a course by its ID
@@ -110,7 +114,7 @@ app.get('/courses/:id', (req, res) => {
 
   const serializedCourse = { id: courseReference.id, title: courseReference.title };
 
-  res.send(serializedCourse);
+  res.status(200).send(serializedCourse);
 });
 
 // 5. Delete a course by its ID
@@ -139,8 +143,10 @@ app.post('/courses/:id', (req, res) => {
     return;
   }
 
-  if (!req.body.title) {
-    res.status(400).send('The course\'s title can\'t be empty.');
+  const { error } = validateTitle(req.body.title, 3, 25);
+
+  if (error) {
+    res.status(400).send(error.details[0].message);
     return;
   }
 
@@ -163,7 +169,7 @@ app.post('/courses/:id', (req, res) => {
   };
 
   topics.push(object);
-  res.send(object);
+  res.status(201).send(object);
 });
 
 // 2. Edit a course's topic by its ID
@@ -183,8 +189,10 @@ app.put('/courses/:id/topics/:topicId', (req, res) => {
     return;
   }
 
-  if (!req.body.title) {
-    res.status(400).send('The topic\'s title can\'t be empty.');
+  const { error } = validateTitle(req.body.title, 3, 25);
+
+  if (error) {
+    res.status(400).send(error.details[0].message);
     return;
   }
 
@@ -211,7 +219,7 @@ app.get('/courses/:id/topics', (req, res) => {
 
   const topics = courseReference.topics;
 
-  res.send(topics);
+  res.status(200).send(topics);
 });
 
 // 4. List a course's topic by its ID
@@ -231,7 +239,7 @@ app.get('/courses/:id/topics/:topicId', (req, res) => {
     return;
   }
 
-  res.send(topicReference);
+  res.status(200).send(topicReference);
 });
 
 // 5. Delete a course's topic by its ID
@@ -256,6 +264,24 @@ app.delete('/courses/:id/topics/:topicId', (req, res) => {
 
   res.status(200).send(topicReference);
 });
+
+// NOTE: Optimization function
+
+function validateTitle(title, min, max) {
+  const schema = Joi.object({
+    title: Joi.string().alphanum().min(min).max(max).required().mesages({
+      'string.base': 'The title must be a string.',
+      'string.empty': 'The title cannot be empty.',
+      'string.base': 'The title must be a string.',
+      'string.alphanum': 'The title must be alphanumeric.',
+      'string.min': `The title must be at least ${min} characters long.`,
+      'string.max': `The title cannot be more than ${max} characters long.`,
+      'string.required': 'The title is required.',
+    })
+  });
+
+  return schema.validate({ title });
+}
 
 const port = 3000 || process.env.PORT;
 
